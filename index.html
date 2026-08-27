@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кликер</title>
+
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+
+        #score {
+            font-size: 30px;
+            margin: 30px;
+        }
+
+        /* Игрок */
+        #player {
+            width: 150px;
+            cursor: pointer;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Машина */
+        #car {
+            position: fixed;
+            left: -300px;
+            bottom: 50px;
+            width: 260px;
+            height: 110px;
+            background: #111;
+            border-radius: 25px 45px 15px 15px;
+            transition: left 2s linear;
+            z-index: 1;
+        }
+
+        /* Окна */
+        #car::before {
+            content: "";
+            position: absolute;
+            left: 45px;
+            top: 15px;
+            width: 160px;
+            height: 40px;
+            background: #555;
+            border-radius: 10px;
+        }
+
+        /* Колёса */
+        #car::after {
+            content: "●       ●";
+            color: #333;
+            font-size: 45px;
+            position: absolute;
+            left: 35px;
+            bottom: -25px;
+            letter-spacing: 50px;
+        }
+
+        /* Картинка внутри машины */
+        #passenger {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            left: 95px;
+            top: -55px;
+            display: none;
+            z-index: 3;
+        }
+
+        .driving {
+            left: calc(100% + 300px) !important;
+        }
+
+        .returning {
+            left: 50% !important;
+            transform: translateX(-50%);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="score">Тапов: 0</div>
+
+    <img id="player" src="click.png" onclick="clicker()">
+
+    <div id="car">
+        <img id="passenger" src="click.png">
+    </div>
+
+    <script>
+        let score = 0;
+
+        const player = document.getElementById("player");
+        const car = document.getElementById("car");
+        const passenger = document.getElementById("passenger");
+
+        function clicker() {
+            score++;
+
+            document.getElementById("score").textContent =
+                "Тапов: " + score;
+
+            if (score % 100 === 0) {
+                ride();
+            }
+        }
+
+        function ride() {
+            // Прячем обычную картинку
+            player.style.display = "none";
+
+            // Сажаем её в машину
+            passenger.style.display = "block";
+
+            // Машина появляется слева
+            car.classList.remove("driving");
+            car.style.left = "-300px";
+
+            // Даём браузеру применить позицию
+            setTimeout(() => {
+                // Машина едет направо
+                car.classList.add("driving");
+            }, 100);
+
+            // После отъезда возвращаем машину слева
+            setTimeout(() => {
+                car.style.transition = "none";
+                car.style.left = "-300px";
+
+                setTimeout(() => {
+                    car.style.transition = "left 2s linear";
+
+                    // Машина возвращается в центр
+                    car.classList.remove("driving");
+                    car.classList.add("returning");
+
+                    setTimeout(() => {
+                        // Высаживаем пассажира
+                        passenger.style.display = "none";
+                        player.style.display = "inline-block";
+
+                        car.classList.remove("returning");
+                        car.style.left = "-300px";
+                    }, 2100);
+
+                }, 50);
+
+            }, 2200);
+        }
+    </script>
+
+</body>
+</html>
